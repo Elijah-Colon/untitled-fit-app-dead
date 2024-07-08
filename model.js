@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(process.env.DBPASSWORD);
 
 const UserSchema = Schema({
   email: {
@@ -17,7 +17,6 @@ const UserSchema = Schema({
     required: [true, "User MUST have a password"],
   },
 });
-mongoose.connect(process.env.YOURPASSWORD);
 
 const WorkoutSchema = Schema({
   Name: {
@@ -47,7 +46,7 @@ const DaySchema = Schema({
   workouts: [
     {
       workout: {
-        type: Schema.types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Workout",
         required: [true, "day needs a workout"],
       },
@@ -109,7 +108,7 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
-const User = mongoose.modal("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
 const Workout = mongoose.model("Workout", WorkoutSchema);
 const Day = mongoose.model("Day", DaySchema);
 const Week = mongoose.model("Week", WeekSchema);
