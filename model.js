@@ -113,6 +113,7 @@ const User = mongoose.modal("User", UserSchema);
 const Workout = mongoose.model("Workout", WorkoutSchema);
 const Day = mongoose.model("Day", DaySchema);
 const Week = mongoose.model("Week", WeekSchema);
+
 module.exports = {
   User,
   Workout,
