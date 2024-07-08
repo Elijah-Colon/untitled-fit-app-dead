@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const model = require("./model");
 const session = require("express-session");
+const { request } = require("http");
 
 const app = express();
 app.use(cors());
@@ -36,6 +37,34 @@ async function AuthMiddleware(request, response, next) {
   }
 }
 
+app.get("users", async (request, response) => {
+  try {
+    let users = await model.User.find({}, {password:0});
+    response.send(user); 
+  }catch(error){
+    response.status(500).send("bad Request")
+  }
+})
+
+app.post("/users", async (request, response)=> {
+  try{
+    let newUser = await new model.User({
+      email: request.body.email,
+      name: request.body.name,
+    });
+    await newUser.setPassword(request.body.password);
+    const error = await newUser.validateSync();
+    if (error){
+      console.log(error);
+      response.status(422).send(error);
+    }
+    await newUser.save();
+    response.status(201).send("new User created");
+  }catch(error){
+    console.log(error);
+    response.status(500).send(error);
+  }
+})
 
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
