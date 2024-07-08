@@ -4,19 +4,19 @@ const { Schema } = mongoose;
 
 mongoose.connect(process.env.DATABASE);
 
-const UserSchema = Schema ({
-  email:{
-    type:String,
-    required:[true,"User MUST have an email"]
-},
-name:{
-    type:String,
-},
-password:{
-    type:String,
-    required:[true, "User MUST have a password"]
-},
-})
+const UserSchema = Schema({
+  email: {
+    type: String,
+    required: [true, "User MUST have an email"],
+  },
+  name: {
+    type: String,
+  },
+  password: {
+    type: String,
+    required: [true, "User MUST have a password"],
+  },
+});
 mongoose.connect(process.env.YOURPASSWORD);
 
 const WorkoutSchema = Schema({
@@ -41,13 +41,14 @@ const WorkoutSchema = Schema({
 
 const DaySchema = Schema({
   name: {
-    type: string,
+    type: String,
     required: [true, "Day needs a name"],
   },
   workouts: [
     {
       workout: {
         type: Schema.types.ObjectId,
+        ref: "Workout",
         required: [true, "day needs a workout"],
       },
     },
@@ -62,6 +63,37 @@ const DaySchema = Schema({
   },
 });
 
+const WeekSchema = Schema({
+  name: {
+    type: String,
+    required: [true, "Week needs a name"],
+  },
+  dow: {
+    type: String,
+    required: [true, "Week needs a day of the week"],
+  },
+  description: {
+    type: String,
+    required: [true, "Week needs a description"],
+  },
+  days: [
+    {
+      day: {
+        type: Schema.Types.ObjectId,
+        ref: "Day",
+        required: [true, "Week needs days"],
+      },
+    },
+  ],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "A week needs an owner"],
+  },
+  reviews: {
+    type: String,
+  },
+});
 
 UserSchema.methods.setPassword = async function (plainPassword) {
   try {
@@ -77,11 +109,13 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
-const User = mongoose.modal("User",UserSchema)
+const User = mongoose.modal("User", UserSchema);
 const Workout = mongoose.model("Workout", WorkoutSchema);
-const Day = mongoose.model("Day", DaySchema)
+const Day = mongoose.model("Day", DaySchema);
+const Week = mongoose.model("Week", WeekSchema);
 module.exports = {
   User,
   Workout,
   Day,
+  Week,
 };
