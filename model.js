@@ -2,9 +2,21 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 
-mongoose.connect(process.env.YOURPASSWORD);
+mongoose.connect(process.env.DATABASE);
 
-
+const UserSchema = Schema ({
+  email:{
+    type:String,
+    required:[true,"User MUST have an email"]
+},
+name:{
+    type:String,
+},
+password:{
+    type:String,
+    required:[true, "User MUST have a password"]
+},
+})
 
 UserSchema.methods.setPassword = async function (plainPassword) {
   try {
@@ -20,6 +32,8 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
+const User = mongoose.modal("User",UserSchema)
 
 module.exports = {
+  User
 };

@@ -36,6 +36,13 @@ async function AuthMiddleware(request, response, next) {
   }
 }
 
+app.get("users", async (request, response) => {
+  try {
+    let users = await model.User.find({}, {password:0});
+    response.send(user); 
+  }catch(error){}
+})
+
 
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
