@@ -39,6 +39,30 @@ const WorkoutSchema = Schema({
   },
 });
 
+const DaySchema = Schema({
+  name: {
+    type: string,
+    required: [true, "Day needs a name"],
+  },
+  workouts: [
+    {
+      workout: {
+        type: Schema.types.ObjectId,
+        required: [true, "day needs a workout"],
+      },
+    },
+  ],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "A day needs an owner"],
+  },
+  reviews: {
+    type: String,
+  },
+});
+
+
 UserSchema.methods.setPassword = async function (plainPassword) {
   try {
     let hashedWord = await bcrypt.hash(plainPassword, 12);
@@ -55,8 +79,9 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
 
 const User = mongoose.modal("User",UserSchema)
 const Workout = mongoose.model("Workout", WorkoutSchema);
-
+const Day = mongoose.model("Day", DaySchema)
 module.exports = {
   User,
   Workout,
+  Day,
 };
