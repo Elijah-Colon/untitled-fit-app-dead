@@ -1,0 +1,62 @@
+Highlight the work out wanting to be incremented 
+
+The week plan 
+Laid out in multiple days and once they click on one and it will have the data highlighted as to what you're working out that day and when clicked on it will  open up the day plan 
+When trying to create a new day of workouts the system will check if you are logged in to create a workout plan
+
+The day plan
+Clicked from the week plan it will open up showing your workouts for the day 
+It will have a drop down menu of the workout description and maybe some suggestions of other similar workouts
+
+
+
+The browse 
+The browse plan will be the first thing people will see whether they are logged in or not showing workouts from other people with two filter buttons by days and weeks
+
+	Backend
+The user will only own what they create and be able to make copies of what other people make in the browse section
+SESSIONS cookie
+
+
+Schema
+Log in 
+Week 
+Going to contain day schemas and nothing else
+Title, DOW,  description , plan , owner, reviews
+Get, put, push, delete
+Day
+name , workout referenced by ID, owner, reviews
+Get, put , push, delete
+Workout
+Name , muscle(list), instructions, reps, sets
+Get ,
+User
+Name, email,password 
+Get and push
+
+	Dev timeline
+model.js
+Password
+index.js
+Session
+Password
+Authenware
+Implementing
+User
+Workout
+Day
+Week
+Increment
+Index.html
+Style.css
+app.js
+Data structure
+All the get
+Client val
+login/modal
+Computed filter
+User
+Workout
+Day
+Week
+Increment
