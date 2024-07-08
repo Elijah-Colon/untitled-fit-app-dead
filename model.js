@@ -4,8 +4,6 @@ const { Schema } = mongoose;
 
 mongoose.connect(process.env.YOURPASSWORD);
 
-
-
 UserSchema.methods.setPassword = async function (plainPassword) {
   try {
     let hashedWord = await bcrypt.hash(plainPassword, 12);
@@ -20,6 +18,27 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
+const DaySchema = schema({
+  name: {
+    type: string,
+    required: [true, "Day needs a name"],
+  },
+  workouts: [
+    {
+      workout: {
+        type: Schema.types.ObjectId,
+        required: [true, "day needs a workout"],
+      },
+    },
+  ],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "A day needs an owner"],
+  },
+  reviews: {
+    type: String,
+  },
+});
 
-module.exports = {
-};
+module.exports = {};
