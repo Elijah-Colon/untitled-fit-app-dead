@@ -38,7 +38,7 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
-const DaySchema = schema({
+const DaySchema = Schema({
   name: {
     type: string,
     required: [true, "Day needs a name"],
