@@ -4,7 +4,25 @@ const { Schema } = mongoose;
 
 mongoose.connect(process.env.YOURPASSWORD);
 
-
+const WorkoutSchema = Schema({
+  Name: {
+    type: String,
+    required: true,
+  },
+  muscle: [{ type: String, required: true }],
+  instructions: {
+    type: String,
+    required: false,
+  },
+  reps: {
+    type: Number,
+    required: false,
+  },
+  sets: {
+    type: Number,
+    required: false,
+  },
+});
 
 UserSchema.methods.setPassword = async function (plainPassword) {
   try {
@@ -20,6 +38,8 @@ UserSchema.methods.verifyPassword = async function (plainPassword) {
   return isGood;
 };
 
+const Workout = mongoose.model("Workout", WorkoutSchema);
 
 module.exports = {
+  Workout,
 };
