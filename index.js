@@ -45,6 +45,7 @@ app.get("users", async (request, response) => {
     response.status(500).send("bad Request")
   }
 })
+
 app.post("/users", async (request, response)=> {
   try{
     let newUser = await new model.User({
