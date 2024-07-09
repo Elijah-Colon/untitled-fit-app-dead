@@ -3,8 +3,6 @@ const cors = require("cors");
 const model = require("./model");
 const session = require("express-session");
 const { request } = require("http");
-const e = require("express");
-const { Quiz } = require("../../week6/kahoot-backend/model");
 
 const app = express();
 app.use(cors());
@@ -79,41 +77,41 @@ app.get("/workouts", async (request, response) => {
   }
 });
 
-app.get("/days/:daysid", async function(req, res) {
-  try{
+app.get("/days/:daysid", async function (req, res) {
+  try {
     console.log(req.params.daysid);
-    let day = await model.Day.findOne({_id: req.params.daysid});
+    let day = await model.Day.findOne({ _id: req.params.daysid });
     console.log(day);
-    if(!day){
+    if (!day) {
       console.log("Day not found");
       res.status(404).send("day not found");
-      return
+      return;
     }
     res.json(day);
-  }catch(error){
+  } catch (error) {
     console.log(error);
     console.log("bad request (Get day)");
-    res.status(400).send("day is not found")
+    res.status(400).send("day is not found");
   }
 });
 
-app.get("/weeks/:weeksid", async function (res,req) {
-  try{
+app.get("/weeks/:weeksid", async function (res, req) {
+  try {
     console.log(req.params.weekid);
-    let week = await model.Week.Findone({_id:req.params.weekid});
+    let week = await model.Week.Findone({ _id: req.params.weekid });
     console.log(week);
-    if(!week){
+    if (!week) {
       console.log("week not found");
       res.status(404).send("week not found");
-      return
+      return;
     }
     res.json(week);
-  }catch(error){
+  } catch (error) {
     console.log(error);
-    console.log("bad requst (Get week)")
-    res.status(400).send("week not found")
+    console.log("bad requst (Get week)");
+    res.status(400).send("week not found");
   }
-})
+});
 
 app.get("/days", async function (request, response) {
   try {
@@ -251,6 +249,24 @@ app.post("/weeks", AuthMiddleware, async function (req, res) {
   } catch (error) {
     console.error(error);
     res.status(422).send(error);
+  }
+});
+
+app.delete("/weeks/:weekID", AuthMiddleware, async function (req, res) {
+  try {
+    let isDeleted = await model.Week.findOneAndDelete({
+      _id: req.params.weekID,
+      owner: req.session.userID,
+    });
+    console.log(isDeleted);
+    if (!isDeleted) {
+      res.status(404).send("Week not found");
+      return;
+    }
+    res.status(204).send("Removed");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
   }
 });
 
