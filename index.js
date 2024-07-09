@@ -151,10 +151,10 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
     if (!day) {
       return response.status(404).send("Could not find that workout");
     }
-    if (request.user._id.toString() === day.owner.toString()) {
-      day.name = request.body.name;
-      day.workouts = request.body.workouts;
-    }
+    // if (request.user._id.toString() === day.owner.toString()) {
+    //   day.name = request.body.name;
+    //   day.workouts = request.body.workouts;
+    // }
     const error = await day.validateSync();
     if (error) {
       response.status(402).send(error);
