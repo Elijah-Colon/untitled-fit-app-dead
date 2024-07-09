@@ -164,23 +164,7 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
     response.status(204).send("Updated");
   } catch (error) {
     console.log(error);
-    response.status(500).send(error);
-  }
-});
-
-app.delete("/days/:id", AuthMiddleware, async function (request, response) {
-  try {
-    let isDeleted = await model.Day.findOneAndDelete({
-      _id: request.params.id,
-      owner: request.user._id,
-    });
-    if (!isDeleted) {
-      return response.status(404).send("Could not delete that");
-    }
-    response.status(204).send("Deleted");
-  } catch (error) {
-    console.log(error);
-    response.status(500).send(error);
+    response.status(500).send("Generic error");
   }
 });
 
