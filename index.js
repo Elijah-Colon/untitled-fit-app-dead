@@ -4,6 +4,7 @@ const model = require("./model");
 const session = require("express-session");
 const { request } = require("http");
 const e = require("express");
+const { Quiz } = require("../../week6/kahoot-backend/model");
 
 const app = express();
 app.use(cors());
@@ -78,6 +79,42 @@ app.get("/workouts", async (request, response) => {
   }
 });
 
+app.get("/days/:daysid", async function (req, res) {
+  try {
+    console.log(req.params.daysid);
+    let day = await model.Day.findOne({ _id: req.params.daysid });
+    console.log(day);
+    if (!day) {
+      console.log("Day not found");
+      res.status(404).send("day not found");
+      return;
+    }
+    res.json(day);
+  } catch (error) {
+    console.log(error);
+    console.log("bad request (Get day)");
+    res.status(400).send("day is not found");
+  }
+});
+
+app.get("/weeks/:weeksid", async function (res, req) {
+  try {
+    console.log(req.params.weekid);
+    let week = await model.Week.Findone({ _id: req.params.weekid });
+    console.log(week);
+    if (!week) {
+      console.log("week not found");
+      res.status(404).send("week not found");
+      return;
+    }
+    res.json(week);
+  } catch (error) {
+    console.log(error);
+    console.log("bad requst (Get week)");
+    res.status(400).send("week not found");
+  }
+});
+
 app.get("/days", async function (request, response) {
   try {
     let day = await model.Day.find()
@@ -145,26 +182,30 @@ app.post("/session", async (request, response) => {
     console.log(error);
   }
 });
-app.put("/days/:id", AuthMiddleware, async function (request, response) {
+app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
   try {
-    let day = await model.Day.findOne({
+    let week = await model.Week.findOne({
       _id: request.params.id,
       owner: request.session.userID,
     }).populate("owner", "-password");
-    if (!day) {
-      response.status(404).send("Could not find that workout");
+    console.log(week);
+    if (!week) {
+      response.status(404).send("could not find that workout");
       return;
     }
-    if (request.user._id.toString() === day.owner._id.toString()) {
-      day.name = request.body.name;
-      day.workouts = request.body.workouts;
+    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id
+    if (request.user._id.toString() === week.owner._id.toString()) {
+      week.name = request.body.name;
+      week.dow = request.body.dow;
+      week.description = request.body.description;
+      week.days = request.body.days;
     }
-    const error = await day.validateSync();
+    const error = await week.validateSync();
     if (error) {
       response.status(402).send(error);
       return;
     }
-    await day.save();
+    await week.save();
     response.status(204).send("Updated");
   } catch (error) {
     console.log(error);
@@ -172,16 +213,31 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
   }
 });
 
-app.delete("/days/:id", AuthMiddleware, async function (request, response) {
+app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
   try {
-    let isDeleted = await model.Day.findOneAndDelete({
+    let week = await model.Week.findOne({
       _id: request.params.id,
-      owner: request.user._id,
-    });
-    if (!isDeleted) {
-      return response.status(404).send("Could not delete that");
+      owner: request.session.userID,
+    }).populate("owner", "-password");
+    console.log(week);
+    if (!week) {
+      response.status(404).send("could not find that workout");
+      return;
     }
-    response.status(204).send("Deleted");
+    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id
+    if (request.user._id.toString() === week.owner._id.toString()) {
+      week.name = request.body.name;
+      week.dow = request.body.dow;
+      week.description = request.body.description;
+      week.days = request.body.days;
+    }
+    const error = await week.validateSync();
+    if (error) {
+      response.status(402).send(error);
+      return;
+    }
+    await week.save();
+    response.status(204).send("Updated");
   } catch (error) {
     console.log(error);
     response.status(500).send(error);
