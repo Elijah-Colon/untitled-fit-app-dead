@@ -75,11 +75,9 @@ const WeekSchema = Schema({
   },
   days: [
     {
-      day: {
-        type: Schema.Types.ObjectId,
-        ref: "Day",
-        required: [true, "Week needs days"],
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Day",
+      required: [true, "Week needs days"],
     },
   ],
   owner: {

@@ -219,6 +219,50 @@ app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
   }
 });
 
+app.get("/weeks", async function (req, res) {
+  try {
+    let week = await model.Week.find()
+      .populate("owner", "-password")
+      .populate("days")
+      .populate({ path: "days", populate: { path: "workouts" } });
+    console.log(week);
+    if (!week) {
+      res.status(404).send("Weeks not found");
+      return;
+    }
+    res.json(week);
+  } catch (error) {
+    console.log(error);
+    res.status(404).send("Wees not found");
+  }
+});
+
+app.post("/weeks", AuthMiddleware, async function (req, res) {
+  try {
+    const newWeek = new model.Week({
+      name: req.body.name,
+      dow: req.body.dow,
+      description: req.body.description,
+      days: req.body.days,
+      owner: req.session.userID,
+      reviews: req.body.reviews,
+    });
+
+    const error = await newWeek.validateSync();
+    if (error) {
+      res.status(422).send(error);
+      console.log(error);
+      return;
+    }
+
+    await newWeek.save();
+    res.status(201).send("Week created :3");
+  } catch (error) {
+    console.error(error);
+    res.status(422).send(error);
+  }
+});
+
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
 });
