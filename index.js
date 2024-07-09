@@ -147,14 +147,21 @@ app.post("/session", async (request, response) => {
 });
 app.put("/days/:id", AuthMiddleware, async function (request, response) {
   try {
-    let day = await model.Day.find({ _id: request.params.id });
+    let day = await model.Day.findOne({
+      _id: request.params.id,
+      owner: request.session.userID,
+    }).populate("owner");
+    console.log(day);
     if (!day) {
-      return response.status(404).send("Could not find that workout");
+      response.status(404).send("Could not find that workout");
+      return;
     }
-    // if (request.user._id.toString() === day.owner.toString()) {
-    //   day.name = request.body.name;
-    //   day.workouts = request.body.workouts;
-    // }
+    console.log(request.session._id, day.owner);
+    if (request.user._id.toString() === day.owner.toString()) {
+      console.log("miau");
+      day.name = request.body.name;
+      day.workouts = request.body.workouts;
+    }
     const error = await day.validateSync();
     if (error) {
       response.status(402).send(error);
