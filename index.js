@@ -3,6 +3,7 @@ const cors = require("cors");
 const model = require("./model");
 const session = require("express-session");
 const { request } = require("http");
+const e = require("express");
 
 const app = express();
 app.use(cors());
@@ -120,6 +121,29 @@ app.post("/session", async (request, response) => {
     console.log(error)
   }
 })
+app.put("/days/:id", AuthMiddleware, async function (request, response) {
+  try {
+    let day = await model.Day.find({ _id: request.params.id });
+    if (!day) {
+      return response.status(404).send("Could not find that workout");
+    }
+    if (request.user._id.toString() === day.owner.toString()) {
+      day.name = request.body.name;
+      day.workouts = request.body.workouts;
+    }
+    const error = await day.validateSync();
+    if (error) {
+      response.status(402).send(error);
+      return;
+    }
+    await day.save();
+    response.status(204).send("Updated");
+  } catch (error) {
+    console.log(error);
+    response.status(500).send("Generic error");
+  }
+});
+
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
 });
