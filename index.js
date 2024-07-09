@@ -3,8 +3,6 @@ const cors = require("cors");
 const model = require("./model");
 const session = require("express-session");
 const { request } = require("http");
-const e = require("express");
-const { Quiz } = require("../../week6/kahoot-backend/model");
 
 const app = express();
 app.use(cors());
@@ -96,6 +94,21 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
   } catch (error) {
     console.log(error);
     response.status(500).send("Generic error");
+  }
+});
+app.delete("/days/:id", AuthMiddleware, async function (request, response) {
+  try {
+    let isDeleted = await model.Day.findOneAndDelete({
+      _id: request.params.id,
+      owner: request.user._id,
+    });
+    if (!isDeleted) {
+      return response.status(404).send("could not delete that");
+    }
+    response.status(204).send("Deleted");
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
   }
 });
 
