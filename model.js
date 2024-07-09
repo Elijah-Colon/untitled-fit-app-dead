@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(process.env.DBPASSWORD);
 
 const UserSchema = Schema({
   email: {
@@ -45,11 +45,9 @@ const DaySchema = Schema({
   },
   workouts: [
     {
-      workout: {
-        type: Schema.Types.ObjectId,
-        ref: "Workout",
-        required: [true, "day needs a workout"],
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Workout",
+      required: [true, "day needs a workout"],
     },
   ],
   owner: {
