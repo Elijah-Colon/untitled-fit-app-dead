@@ -151,14 +151,11 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
       _id: request.params.id,
       owner: request.session.userID,
     }).populate("owner");
-    console.log(day);
     if (!day) {
       response.status(404).send("Could not find that workout");
       return;
     }
-    console.log(request.session._id, day.owner);
-    if (request.user._id.toString() === day.owner.toString()) {
-      console.log("miau");
+    if (request.user._id.toString() === day.owner._id.toString()) {
       day.name = request.body.name;
       day.workouts = request.body.workouts;
     }
