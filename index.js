@@ -37,11 +37,12 @@ async function AuthMiddleware(request, response, next) {
   }
 }
 
-app.get("users", async (request, response) => {
+app.get("/users", async (request, response) => {
   try {
     let users = await model.User.find({}, { password: 0 });
-    response.send(user);
+    response.send(users);
   } catch (error) {
+    console.log(error);
     response.status(500).send("bad Request");
   }
 });
@@ -117,6 +118,33 @@ app.post("/days", AuthMiddleware, async function (req, res) {
   }
 });
 
+app.get("/session", (response, request) => {
+  response.send(request.session);
+});
+
+app.delete("/session", function (request, response) {
+  request.session.userID = undefined;
+  response.status(204).send();
+});
+
+app.post("/session", async (request, response) => {
+  try {
+    let user = await model.User.findOne({ email: request.body.email });
+    if (!user) {
+      return response.status(401).send("Authentication failed");
+    }
+    let isGoodPassword = await user.verifyPassword(request.body.password);
+    if (!isGoodPassword) {
+      return response.status(401).send("Authentication failed");
+    }
+    request.session.userID = user._id;
+    request.session.name = user.name;
+    response.status(204).send(request.session);
+  } catch (error) {
+    response.status(500);
+    console.log(error);
+  }
+});
 app.put("/days/:id", AuthMiddleware, async function (request, response) {
   try {
     let day = await model.Day.find({ _id: request.params.id });
