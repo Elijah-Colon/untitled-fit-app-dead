@@ -80,7 +80,7 @@ app.get("/days", async function (request, response) {
   try {
     let day = await model.Day.find()
       .populate("owner", "-password")
-      .populate("workout");
+      .populate("workouts");
     if (!day) {
       return response.status(404).send("Could not find that workout");
     }
@@ -89,6 +89,30 @@ app.get("/days", async function (request, response) {
   } catch (error) {
     console.log(error);
     response.status(500).send(error);
+  }
+});
+
+app.post("/days", AuthMiddleware, async function (req, res) {
+  try {
+    const newDay = new model.Day({
+      name: req.body.name,
+      workouts: req.body.workouts,
+      owner: req.session.userID,
+      reviews: req.body.reviews,
+    });
+
+    const error = await newDay.validateSync();
+    if (error) {
+      res.status(422).send(error);
+      console.error(error);
+      return;
+    }
+
+    await newDay.save();
+    res.status(201).send("Created Day :3");
+  } catch (error) {
+    console.error(error);
+    res.status(422).send(error);
   }
 });
 
