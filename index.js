@@ -303,6 +303,24 @@ app.post("/weeks", AuthMiddleware, async function (req, res) {
   }
 });
 
+app.delete("/weeks/:weekID", AuthMiddleware, async function (req, res) {
+  try {
+    let isDeleted = await model.Week.findOneAndDelete({
+      _id: req.params.weekID,
+      owner: req.session.userID,
+    });
+    console.log(isDeleted);
+    if (!isDeleted) {
+      res.status(404).send("Week not found");
+      return;
+    }
+    res.status(204).send("Removed");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
 });
