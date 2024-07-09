@@ -4,6 +4,7 @@ const model = require("./model");
 const session = require("express-session");
 const { request } = require("http");
 const e = require("express");
+const { Quiz } = require("../../week6/kahoot-backend/model");
 
 const app = express();
 app.use(cors());
@@ -78,6 +79,42 @@ app.get("/workouts", async (request, response) => {
   }
 });
 
+app.get("/days/:daysid", async function(req, res) {
+  try{
+    console.log(req.params.daysid);
+    let day = await model.Day.findOne({_id: req.params.daysid});
+    console.log(day);
+    if(!day){
+      console.log("Day not found");
+      res.status(404).send("day not found");
+      return
+    }
+    res.json(day);
+  }catch(error){
+    console.log(error);
+    console.log("bad request (Get day)");
+    res.status(400).send("day is not found")
+  }
+});
+
+app.get("/weeks/:weeksid", async function (res,req) {
+  try{
+    console.log(req.params.weekid);
+    let week = await model.Week.Findone({_id:req.params.weekid});
+    console.log(week);
+    if(!week){
+      console.log("week not found");
+      res.status(404).send("week not found");
+      return
+    }
+    res.json(week);
+  }catch(error){
+    console.log(error);
+    console.log("bad requst (Get week)")
+    res.status(400).send("week not found")
+  }
+})
+
 app.get("/days", async function (request, response) {
   try {
     let day = await model.Day.find()
@@ -151,11 +188,14 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
       _id: request.params.id,
       owner: request.session.userID,
     }).populate("owner");
+    console.log(day);
     if (!day) {
       response.status(404).send("Could not find that workout");
       return;
     }
-    if (request.user._id.toString() === day.owner._id.toString()) {
+    console.log(request.session._id, day.owner);
+    if (request.userID.toString() !== day.owner.toString()) {
+      console.log("miau");
       day.name = request.body.name;
       day.workouts = request.body.workouts;
     }
