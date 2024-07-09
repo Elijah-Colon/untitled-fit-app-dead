@@ -92,6 +92,12 @@ app.get("/days", async function (request, response) {
   }
 });
 
+app.get('/session',AuthMiddleware(),(response,request) => {
+  response.send(request.session);
+})
+app.delete("/session", function(request,response){
+  request.session.userID
+})
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
 });
