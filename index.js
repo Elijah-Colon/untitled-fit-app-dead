@@ -150,7 +150,7 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
     let day = await model.Day.findOne({
       _id: request.params.id,
       owner: request.session.userID,
-    }).populate("owner");
+    }).populate("owner", "-password");
     if (!day) {
       response.status(404).send("Could not find that workout");
       return;
@@ -182,6 +182,37 @@ app.delete("/days/:id", AuthMiddleware, async function (request, response) {
       return response.status(404).send("Could not delete that");
     }
     response.status(204).send("Deleted");
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
+  }
+});
+
+app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
+  try {
+    let week = await model.Week.findOne({
+      _id: request.params.id,
+      owner: request.session.userID,
+    }).populate("owner", "-password");
+    console.log(week);
+    if (!week) {
+      response.status(404).send("could not find that workout");
+      return;
+    }
+    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id
+    if (request.user._id.toString() === week.owner._id.toString()) {
+      week.name = request.body.name;
+      week.dow = request.body.dow;
+      week.description = request.body.description;
+      week.days = request.body.days;
+    }
+    const error = await week.validateSync();
+    if (error) {
+      response.status(402).send(error);
+      return;
+    }
+    await week.save();
+    response.status(204).send("Updated");
   } catch (error) {
     console.log(error);
     response.status(500).send(error);
