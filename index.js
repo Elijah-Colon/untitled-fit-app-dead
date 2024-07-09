@@ -20,7 +20,6 @@ app.use(
 //this one might not need to be here
 app.use(express.static("public"));
 
-
 async function AuthMiddleware(request, response, next) {
   // step one check if they have a session
   if (request.session && request.session.userID) {
@@ -39,32 +38,59 @@ async function AuthMiddleware(request, response, next) {
 
 app.get("users", async (request, response) => {
   try {
-    let users = await model.User.find({}, {password:0});
-    response.send(user); 
-  }catch(error){
-    response.status(500).send("bad Request")
+    let users = await model.User.find({}, { password: 0 });
+    response.send(user);
+  } catch (error) {
+    response.status(500).send("bad Request");
   }
-})
+});
 
-app.post("/users", async (request, response)=> {
-  try{
+app.post("/users", async (request, response) => {
+  try {
     let newUser = await new model.User({
       email: request.body.email,
       name: request.body.name,
     });
     await newUser.setPassword(request.body.password);
     const error = await newUser.validateSync();
-    if (error){
+    if (error) {
       console.log(error);
       response.status(422).send(error);
     }
     await newUser.save();
     response.status(201).send("new User created");
-  }catch(error){
+  } catch (error) {
     console.log(error);
     response.status(500).send(error);
   }
-})
+});
+// for the workout one where would we be getting the information and how?
+app.get("/workouts", async (request, response) => {
+  try {
+    let workout = await model.Workout.find();
+    response.send(workout);
+    console.log(workout);
+  } catch (error) {
+    console.log(error);
+    response.status(500).send("Generic error");
+  }
+});
+
+app.get("/days", async function (request, response) {
+  try {
+    let day = await model.Day.find()
+      .populate("owner", "-password")
+      .populate("workout");
+    if (!day) {
+      return response.status(404).send("Could not find that workout");
+    }
+    response.json(day);
+    console.log(day);
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
+  }
+});
 
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
