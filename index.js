@@ -64,7 +64,7 @@ app.post("/users", async (request, response) => {
     response.status(500).send(error);
   }
 });
-
+// for the workout one where would we be getting the information and how?
 app.get("/workouts", async (request, response) => {
   try {
     let workout = await model.Workout.find();
@@ -72,7 +72,23 @@ app.get("/workouts", async (request, response) => {
     console.log(workout);
   } catch (error) {
     console.log(error);
-    response.status(404).send("Generic error");
+    response.status(500).send("Generic error");
+  }
+});
+
+app.get("/days", async function (request, response) {
+  try {
+    let day = await model.Day.find()
+      .populate("owner", "-password")
+      .populate("workout");
+    if (!day) {
+      return response.status(404).send("Could not find that workout");
+    }
+    response.json(day);
+    console.log(day);
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
   }
 });
 
