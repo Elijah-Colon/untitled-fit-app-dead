@@ -1,8 +1,14 @@
 Vue.createApp({
     data() {
-      return {};
+      return {
+        page:"Home"
+      };
     },
-    methods: {},
+    methods: {
+      setPage: function(page){
+        this.page = page
+      }
+    },
     created: function () {
       console.log("app loaded");
     },

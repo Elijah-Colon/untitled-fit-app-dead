@@ -39,6 +39,10 @@ async function AuthMiddleware(request, response, next) {
   }
 }
 
+//
+// Users
+//
+
 app.get("/users", async (request, response) => {
   try {
     let users = await model.User.find({}, { password: 0 });
@@ -68,7 +72,15 @@ app.post("/users", async (request, response) => {
     response.status(500).send(error);
   }
 });
+
+//
+// Workouts
+//
+
+// might want to add a post for workouts
+
 // for the workout one where would we be getting the information and how?
+// we just pluged in the info into the database
 app.get("/workouts", async (request, response) => {
   try {
     let workout = await model.Workout.find();
@@ -80,8 +92,58 @@ app.get("/workouts", async (request, response) => {
   }
 });
 
-app.get("/days/:daysid", async function(req, res) {
-  try{
+//
+// Days
+//
+
+app.put("/days/:id", AuthMiddleware, async function (request, response) {
+  try {
+    let day = await model.Day.findOne({
+      _id: request.params.id,
+      owner: request.session.userID,
+    }).populate("owner", "-password");
+
+    console.log(day);
+    if (!day) {
+      response.status(404).send("Could not find that workout");
+      return;
+    }
+    console.log(request.session._id, day.owner);
+    if (request.userID.toString() !== day.owner.toString()) {
+      console.log("miau");
+      day.name = request.body.name;
+      day.workouts = request.body.workouts;
+    }
+    const error = await day.validateSync();
+    if (error) {
+      response.status(402).send(error);
+      return;
+    }
+    await day.save();
+    response.status(204).send("Updated");
+  } catch (error) {
+    console.log(error);
+    response.status(500).send("Generic error");
+  }
+});
+app.delete("/days/:id", AuthMiddleware, async function (request, response) {
+  try {
+    let isDeleted = await model.Day.findOneAndDelete({
+      _id: request.params.id,
+      owner: request.user._id,
+    });
+    if (!isDeleted) {
+      return response.status(404).send("could not delete that");
+    }
+    response.status(204).send("Deleted");
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
+  }
+});
+
+app.get("/days/:daysid", async function (req, res) {
+  try {
     console.log(req.params.daysid);
     let day = await model.Day.findOne({_id: req.params.daysid});
     console.log(day);
@@ -97,24 +159,6 @@ app.get("/days/:daysid", async function(req, res) {
     res.status(400).send("day is not found")
   }
 });
-
-app.get("/weeks/:weeksid", async function (res,req) {
-  try{
-    console.log(req.params.weekid);
-    let week = await model.Week.Findone({_id:req.params.weekid});
-    console.log(week);
-    if(!week){
-      console.log("week not found");
-      res.status(404).send("week not found");
-      return
-    }
-    res.json(week);
-  }catch(error){
-    console.log(error);
-    console.log("bad requst (Get week)")
-    res.status(400).send("week not found")
-  }
-})
 
 app.get("/days", async function (request, response) {
   try {
@@ -156,6 +200,10 @@ app.post("/days", AuthMiddleware, async function (req, res) {
   }
 });
 
+//
+// Sessions
+//
+
 app.get("/session", (response, request) => {
   response.send(request.session);
 });
@@ -183,7 +231,12 @@ app.post("/session", async (request, response) => {
     console.log(error);
   }
 });
-app.put("/days/:id", AuthMiddleware, async function (request, response) {
+
+//
+// Weeks
+//
+
+app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
   try {
     let day = await model.Day.findOne({
       _id: request.params.id,
@@ -194,11 +247,12 @@ app.put("/days/:id", AuthMiddleware, async function (request, response) {
       response.status(404).send("Could not find that workout");
       return;
     }
-    console.log(request.session._id, day.owner);
-    if (request.userID.toString() !== day.owner.toString()) {
-      console.log("miau");
-      day.name = request.body.name;
-      day.workouts = request.body.workouts;
+    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id.
+    if (request.user._id.toString() === week.owner._id.toString()) {
+      week.name = request.body.name;
+      week.dow = request.body.dow;
+      week.description = request.body.description;
+      week.days = request.body.days;
     }
     const error = await day.validateSync();
     if (error) {
@@ -255,7 +309,44 @@ app.post("/weeks", AuthMiddleware, async function (req, res) {
   }
 });
 
+// need to maybe add when we delete a week we delete the day.
+// unless the day is a seperate thing that they just add.
 
+app.delete("/weeks/:weekID", AuthMiddleware, async function (req, res) {
+  try {
+    let isDeleted = await model.Week.findOneAndDelete({
+      _id: req.params.weekID,
+      owner: req.session.userID,
+    });
+    console.log(isDeleted);
+    if (!isDeleted) {
+      res.status(404).send("Week not found");
+      return;
+    }
+    res.status(204).send("Removed");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
+app.get("/weeks/:weeksid", async function (res, req) {
+  try {
+    console.log(req.params.weekid);
+    let week = await model.Week.Findone({ _id: req.params.weekid });
+    console.log(week);
+    if (!week) {
+      console.log("week not found");
+      res.status(404).send("week not found");
+      return;
+    }
+    res.json(week);
+  } catch (error) {
+    console.log(error);
+    console.log("bad requst (Get week)");
+    res.status(400).send("week not found");
+  }
+});
 
 app.listen(8080, function () {
   console.log("server is running on http://localhost:8080...");
