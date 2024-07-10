@@ -17,7 +17,6 @@ app.use(
     saveUninitialized: true,
     resave: false,
   })
-
 );
 
 //this one might not need to be here
@@ -145,18 +144,18 @@ app.delete("/days/:id", AuthMiddleware, async function (request, response) {
 app.get("/days/:daysid", async function (req, res) {
   try {
     console.log(req.params.daysid);
-    let day = await model.Day.findOne({_id: req.params.daysid});
+    let day = await model.Day.findOne({ _id: req.params.daysid });
     console.log(day);
-    if(!day){
+    if (!day) {
       console.log("Day not found");
       res.status(404).send("day not found");
-      return
+      return;
     }
     res.json(day);
-  }catch(error){
+  } catch (error) {
     console.log(error);
     console.log("bad request (Get day)");
-    res.status(400).send("day is not found")
+    res.status(400).send("day is not found");
   }
 });
 
@@ -271,7 +270,9 @@ app.get("/weeks", async function (req, res) {
   try {
     let week = await model.Week.find()
       .populate("owner", "-password")
-      .populate("days");
+      .populate("days")
+      .populate({ path: "days", populate: { path: "workouts" } });
+    console.log(week);
     if (!week) {
       res.status(404).send("Weeks not found");
       return;
