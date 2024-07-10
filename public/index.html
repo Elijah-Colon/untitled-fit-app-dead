@@ -9,7 +9,27 @@
 </head>
 <body>
     <div id="app">
+        <nav>
 
+            <h1> Untitled fit app</h1>
+            <p v-if="currentUser"> welcome, {{ currentUser.name }}</p>
+            <button v-if="currentUser" @click="deleteSession()">logout</button>
+        </nav>
+        
+        <div v-if="currentPage === 'login'" class="login">
+            <form @submit.prevent="loginUser()">
+                <div class="input-container">
+                    <p class="label">Email </p>
+                    <input type="email" v-model="user.email">
+                </div>
+                <div class="input-container">
+                    <p class="label">Password</p>
+                    <input type="password" v-model="user.password">
+                </div>
+                <button>Log in</button>
+                <p>Dont have an account? <span @click="setPage('register')">sign up</span></p>
+            </form>
+        </div>
 
     </div>
     <script src="app.js"></script>

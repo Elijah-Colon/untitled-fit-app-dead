@@ -1,15 +1,46 @@
+const URL = "http://localhost:8080";
+
 Vue.createApp({
-    data() {
-      return {
-        page:"Home"
-      };
+  data() {
+    return {
+      workouts: [],
+      days: [],
+      weeks: [],
+      page:"",
+    };
+  },
+  methods: {
+    getWorkouts: async function () {
+      let response = await fetch(`${URL}/workouts`);
+
+      let data = await response.json();
+      this.workouts = data;
+      console.log(data);
     },
-    methods: {
-      setPage: function(page){
-        this.page = page
-      }
+
+    getDays: async function () {
+      let response = await fetch(`${URL}/days`);
+
+      let data = await response.json();
+      this.days = data;
+      console.log(data);
     },
-    created: function () {
-      console.log("app loaded");
+
+    getWeeks: async function () {
+      let response = await fetch(`${URL}/weeks`);
+
+      let data = await response.json();
+      this.weeks = data;
+      console.log(data);
     },
-  }).mount("#app");
+    setPage: function(page){
+      this.page = page
+    },
+  },
+  created: function () {
+    console.log("app loaded");
+    this.getWorkouts();
+    this.getDays();
+    this.getWeeks();
+  },
+}).mount("#app");
