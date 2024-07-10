@@ -6,10 +6,11 @@ Vue.createApp({
       workouts: [],
       days: [],
       weeks: [],
-      page:"",
+      page: "",
     };
   },
   methods: {
+    // Get for workouts
     getWorkouts: async function () {
       let response = await fetch(`${URL}/workouts`);
 
@@ -17,7 +18,7 @@ Vue.createApp({
       this.workouts = data;
       console.log(data);
     },
-
+    // Days
     getDays: async function () {
       let response = await fetch(`${URL}/days`);
 
@@ -25,7 +26,7 @@ Vue.createApp({
       this.days = data;
       console.log(data);
     },
-
+    // Weeks
     getWeeks: async function () {
       let response = await fetch(`${URL}/weeks`);
 
@@ -33,9 +34,13 @@ Vue.createApp({
       this.weeks = data;
       console.log(data);
     },
-    setPage: function(page){
-      this.page = page
+
+    // Page transistion
+    setPage: function (page) {
+      this.page = page;
     },
+
+    // sessions and log in
   },
   created: function () {
     console.log("app loaded");
