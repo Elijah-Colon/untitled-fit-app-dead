@@ -14,8 +14,62 @@
         <p>Browse</p>
         <p>Create</p>
         <p>About us</p>
-        <button>Login</button>
+
+        <button @click="setPage('login')">Login</button>
       </nav>
+      <div v-if="currentPage === 'Browse'">
+        <div class="search">
+          <input type="search" placeholder="search...." />
+          <div>
+            <button @click="sortWorkouts('day')">Days</button>
+            <button @click="sortWorkouts('week')">Weeks</button>
+          </div>
+          <hr />
+        </div>
+
+        <div class="Browse"></div>
+      </div>
+      <div v-if="currentPage === 'login'">
+        <form @submit.prevent="loginUser()">
+          <div class="input-container">
+            <p class="label">Email</p>
+            <br />
+            <input type="email" v-model="user.email" />
+          </div>
+          <div class="input-container">
+            <p class="label">Password</p>
+            <br />
+            <input type="password" v-model="user.password" />
+          </div>
+          <button class="loginButton">Log in</button>
+          <p>
+            Dont have an acount?
+            <span @click="setPage('register')">sign up</span>
+          </p>
+        </form>
+      </div>
+
+      <div v-if="currentPage === 'register'">
+        <form @submit.prevent="registerUser()">
+          <div class="input-container">
+            <p class="label">Name</p>
+            <input type="text" v-model="user.name" />
+          </div>
+          <div class="input-container">
+            <p class="label">Email</p>
+            <input type="email" v-model="user.email" />
+          </div>
+          <div class="input-container">
+            <p class="label">Password</p>
+            <input type="password" v-model="user.password" />
+          </div>
+          <button>Register</button>
+          <p>
+            Already have an account?
+            <span @click="setPage('login')">Log in</span>
+          </p>
+        </form>
+      </div>
     </div>
     <script src="app.js"></script>
   </body>

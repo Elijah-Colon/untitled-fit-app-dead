@@ -1,9 +1,22 @@
 Vue.createApp({
-    data() {
-      return {};
+  data() {
+    return {
+      days: [],
+      weeks: [],
+      currentPage: "Browse",
+      user: {
+        name: "",
+        email: "",
+        password: "",
+      },
+    };
+  },
+  methods: {
+    setPage: function (page) {
+      this.currentPage = page;
     },
-    methods: {},
-    created: function () {
-      console.log("app loaded");
-    },
-  }).mount("#app");
+  },
+  created: function () {
+    console.log("app loaded");
+  },
+}).mount("#app");
