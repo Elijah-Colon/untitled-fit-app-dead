@@ -36,6 +36,10 @@ async function AuthMiddleware(request, response, next) {
   }
 }
 
+//
+// Users
+//
+
 app.get("/users", async (request, response) => {
   try {
     let users = await model.User.find({}, { password: 0 });
@@ -65,6 +69,29 @@ app.post("/users", async (request, response) => {
     response.status(500).send(error);
   }
 });
+
+//
+// Workouts
+//
+
+// might want to add a post for workouts
+
+// for the workout one where would we be getting the information and how?
+// we just pluged in the info into the database
+app.get("/workouts", async (request, response) => {
+  try {
+    let workout = await model.Workout.find();
+    response.send(workout);
+    console.log(workout);
+  } catch (error) {
+    console.log(error);
+    response.status(500).send("Generic error");
+  }
+});
+
+//
+// Days
+//
 
 app.put("/days/:id", AuthMiddleware, async function (request, response) {
   try {
@@ -112,18 +139,6 @@ app.delete("/days/:id", AuthMiddleware, async function (request, response) {
   }
 });
 
-// for the workout one where would we be getting the information and how?
-app.get("/workouts", async (request, response) => {
-  try {
-    let workout = await model.Workout.find();
-    response.send(workout);
-    console.log(workout);
-  } catch (error) {
-    console.log(error);
-    response.status(500).send("Generic error");
-  }
-});
-
 app.get("/days/:daysid", async function (req, res) {
   try {
     console.log(req.params.daysid);
@@ -139,24 +154,6 @@ app.get("/days/:daysid", async function (req, res) {
     console.log(error);
     console.log("bad request (Get day)");
     res.status(400).send("day is not found");
-  }
-});
-
-app.get("/weeks/:weeksid", async function (res, req) {
-  try {
-    console.log(req.params.weekid);
-    let week = await model.Week.Findone({ _id: req.params.weekid });
-    console.log(week);
-    if (!week) {
-      console.log("week not found");
-      res.status(404).send("week not found");
-      return;
-    }
-    res.json(week);
-  } catch (error) {
-    console.log(error);
-    console.log("bad requst (Get week)");
-    res.status(400).send("week not found");
   }
 });
 
@@ -200,6 +197,10 @@ app.post("/days", AuthMiddleware, async function (req, res) {
   }
 });
 
+//
+// Sessions
+//
+
 app.get("/session", (response, request) => {
   response.send(request.session);
 });
@@ -228,6 +229,10 @@ app.post("/session", async (request, response) => {
   }
 });
 
+//
+// Weeks
+//
+
 app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
   try {
     let week = await model.Week.findOne({
@@ -239,7 +244,7 @@ app.put("/weeks/:id", AuthMiddleware, async function (request, response) {
       response.status(404).send("could not find that workout");
       return;
     }
-    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id
+    // This might not be needed as when we go to fecth the week we also pass in the owner and it will only return the one with the owner the same as the session id.
     if (request.user._id.toString() === week.owner._id.toString()) {
       week.name = request.body.name;
       week.dow = request.body.dow;
@@ -303,6 +308,9 @@ app.post("/weeks", AuthMiddleware, async function (req, res) {
   }
 });
 
+// need to maybe add when we delete a week we delete the day.
+// unless the day is a seperate thing that they just add.
+
 app.delete("/weeks/:weekID", AuthMiddleware, async function (req, res) {
   try {
     let isDeleted = await model.Week.findOneAndDelete({
@@ -318,6 +326,24 @@ app.delete("/weeks/:weekID", AuthMiddleware, async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
+  }
+});
+
+app.get("/weeks/:weeksid", async function (res, req) {
+  try {
+    console.log(req.params.weekid);
+    let week = await model.Week.Findone({ _id: req.params.weekid });
+    console.log(week);
+    if (!week) {
+      console.log("week not found");
+      res.status(404).send("week not found");
+      return;
+    }
+    res.json(week);
+  } catch (error) {
+    console.log(error);
+    console.log("bad requst (Get week)");
+    res.status(400).send("week not found");
   }
 });
 
